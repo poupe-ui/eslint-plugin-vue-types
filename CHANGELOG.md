@@ -10,9 +10,5 @@ and this project adheres to
 
 ### Added
 
-- Initial package structure and configuration
-- Build configuration with unbuild
-- ESLint and TypeScript configuration
-- Documentation files (README, LICENSE, AGENT, CHANGELOG)
-- GitHub Actions workflows for CI/CD
-- Renovate configuration for dependency management
+- CLI tool `vue-types-gen` for generating TypeScript type definitions from
+  eslint-plugin-vue source

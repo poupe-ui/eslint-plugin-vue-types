@@ -187,12 +187,15 @@ eslint-plugin-vue types.
 4. **Configuration Types**: Vue ESLint configuration type definitions
 5. **Drop-in Replacement**: Can be used via TypeScript path mapping or
    direct import
+6. **CLI Tool**: `vue-types-gen` generates types from eslint-plugin-vue source
 
 ### Project Structure
 
 ```text
 .
 ├── src/              # Source code
+│   ├── cli/          # CLI tool
+│   │   └── index.ts  # vue-types-gen command
 │   ├── configs/      # Configuration type definitions
 │   │   └── index.ts  # Config types export
 │   ├── types/        # Type definitions
@@ -246,6 +249,52 @@ eslint-plugin-vue types.
    ```typescript
    import vuePlugin from '@poupe/eslint-plugin-vue-types';
    ```
+
+## Type Generation Patterns
+
+### Rule Type Structure
+
+When generating or manually creating rule types, follow these patterns:
+
+1. **Simple Rules (no options)**:
+
+   ```typescript
+   export type VueRuleName = EmptyRuleOptions;
+   ```
+
+2. **Rules with string/enum options**:
+
+   ```typescript
+   export type VueRuleName =
+     [] |
+     ['option1' | 'option2'];
+   ```
+
+3. **Rules with object options** (use auxiliary types):
+
+   ```typescript
+   /**
+    * @see https://eslint.vuejs.org/rules/rule-name.html
+    */
+   export type VueRuleName =
+     [] |
+     ['option'] |
+     ['option', VueRuleNameOptions];
+
+   type VueRuleNameOptions = {
+     property?: boolean;
+     anotherProperty?: string;
+   };
+   ```
+
+### Formatting Rules
+
+- **Union operators**: Always place `|` at the end of lines, not the beginning
+- **Arrays**: Empty array `[]` first, then simple options, then options with
+  additional parameters
+- **Line length**: Maximum 80 characters - use auxiliary types to avoid long
+  lines
+- **TSDoc**: Place above the exported type, not the auxiliary type
 
 ## Common Tasks
 
@@ -317,6 +366,39 @@ pnpm add -D file:../eslint-plugin-vue-types
 pnpm type-check
 ```
 
+### Using the CLI Tool
+
+The `vue-types-gen` CLI tool generates TypeScript types from eslint-plugin-vue:
+
+```bash
+# Generate types to stdout (default)
+vue-types-gen /path/to/eslint-plugin-vue
+
+# Pipe to a file
+vue-types-gen /path/to/eslint-plugin-vue > src/types/rules.ts
+
+# Specify output file directly
+vue-types-gen /path/to/eslint-plugin-vue -o ./my-types.ts
+
+# Explicit stdout (same as default)
+vue-types-gen /path/to/eslint-plugin-vue -o -
+
+# Enable verbose logging (goes to stderr)
+vue-types-gen /path/to/eslint-plugin-vue -v
+```
+
+The CLI will:
+
+1. Analyze all Vue ESLint rules in the source directory
+2. Extract rule schemas and options (TODO - currently just counts)
+3. Generate properly formatted TypeScript types (TODO - currently placeholder)
+4. Apply the agreed formatting patterns (TODO)
+5. Output to stdout by default (or when `-o -`), or to a file if specified
+6. All logs and messages go to stderr, keeping stdout clean for piping
+
+**Current Status**: Foundation implemented with modular structure, logging,
+and basic analysis. Actual type generation is the next step.
+
 ### Building the Package
 
 ```bash
@@ -370,3 +452,28 @@ For projects currently using the type-overrides hack:
 - When Vue plugin updates types, this package may become obsolete
 - Consider automating type generation from Vue plugin source
 - Add CLI tool for updating types when Vue plugin updates
+
+## Lessons Learned
+
+### ESLint Configuration
+
+- Max line length is 80 characters by default in @poupe/eslint-config
+- Operators must be placed AFTER, not before (e.g., `|` at end of line)
+- Empty array `[]` should be the last option in union types
+- Use `pnpm lint` frequently to catch formatting issues early
+
+### Package Structure
+
+- ES modules require proper imports (no require())
+- Binary files need to be included in build configuration
+- Dependencies used in runtime code should be in `dependencies`, not
+  `devDependencies`
+- Use citty for CLI tools - provides good command structure and help generation
+
+### Type Generation Strategy
+
+- Auxiliary types improve readability and maintainability
+- Forward references work in TypeScript - auxiliary types can be defined after
+  use
+- TSDoc comments should stay with the exported type for better documentation
+- Complex inline object types should always be extracted to auxiliary types
