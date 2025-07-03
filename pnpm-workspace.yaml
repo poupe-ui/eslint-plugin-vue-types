@@ -1,0 +1,3 @@
+onlyBuiltDependencies:
+  - '@poupe/eslint-config'
+  - esbuild
