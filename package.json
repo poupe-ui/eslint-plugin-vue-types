@@ -61,7 +61,7 @@
     "@types/eslint": "^9.0.0",
     "citty": "^0.1.6",
     "consola": "^3.0.0",
-    "pathe": "^1.0.0"
+    "pathe": "^2.0.0"
   },
   "devDependencies": {
     "@poupe/eslint-config": "^0.7.11",
