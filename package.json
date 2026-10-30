@@ -54,7 +54,7 @@
     "@types/eslint": "^9.0.0"
   },
   "devDependencies": {
-    "@poupe/eslint-config": "^0.7.11",
+    "@poupe/eslint-config": "^0.10.0",
     "cross-env": "^7.0.3",
     "eslint": "^9.30.1",
     "npm-run-all2": "^8.0.4",
